@@ -6,8 +6,8 @@ export default class TableRow extends Component {
     const { columns, data } = this.props;
     return (
       <tr>
-        {columns.map(({ id, props, renderCell }) => (
-          <td {...props} key={id}>
+        {columns.map(({ id, props, renderCell }, idx) => (
+          <td {...props} key={`${id}_${idx}`}>
             {renderCell ? renderCell(data[id], data) : data[id]}
           </td>
         ))}

@@ -16,10 +16,13 @@ export default class TableHead extends Component {
   render() {
     const { columns } = this.props;
     return (
-      <thead className="thead-light sticky-top bg-secondary text-light">
+      <thead
+        className="thead-light sticky-top bg-secondary text-light"
+        style={{ top: 70 }}
+      >
         <tr>
           {columns.map(({ id, label, props }) => (
-            <th scope="col" {...props} key={id}>
+            <th scope="col" {...props} key={`${id}_${label}`}>
               {label}
             </th>
           ))}

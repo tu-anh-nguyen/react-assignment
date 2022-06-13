@@ -3,58 +3,36 @@ import React, { Component } from "react";
 export default class Header extends Component {
   render() {
     return (
-      <div className="container-fluid sticky-top">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light w-100">
-          <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-              Navbar
-            </a>
-            <button
-              class="navbar-toggler"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#navbarNavDarkDropdown"
-              aria-controls="navbarNavDarkDropdown"
-              aria-expanded="false"
-              aria-label="Toggle navigation"
+      <div className="container-xl sticky-top mb-2">
+        <nav className="navbar navbar-expand-lg bg-light w-100">
+          <div className="container-fluid">
+            <div
+              className="collapse navbar-collapse"
+              id="navbarSupportedContent"
             >
-              <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
-              <ul class="navbar-nav">
-                <li class="nav-item dropdown">
-                  <a
-                    class="nav-link dropdown-toggle"
-                    href="#"
-                    id="navbarDarkDropdownMenuLink"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    Dropdown
+              <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                <li className="nav-item">
+                  <a className="nav-link" href="/">
+                    Home
                   </a>
-                  <ul
-                    class="dropdown-menu dropdown-menu-dark"
-                    aria-labelledby="navbarDarkDropdownMenuLink"
-                  >
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        Action
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        Another action
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        Something else here
-                      </a>
-                    </li>
-                  </ul>
+                </li>
+                <li className="nav-item">
+                  <a className="nav-link" href="/create">
+                    Create new user
+                  </a>
                 </li>
               </ul>
+              <form className="d-flex" role="search">
+                <input
+                  className="form-control me-2"
+                  type="search"
+                  placeholder="Search"
+                  aria-label="Search"
+                />
+                <button className="btn btn-outline-success" type="submit">
+                  Search
+                </button>
+              </form>
             </div>
           </div>
         </nav>

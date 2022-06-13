@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { NavLink } from "react-router-dom";
 import fetcher from "../../services/fetcher";
 import TableFooter from "./TableFooter";
 import TableHead from "./TableHead";
@@ -94,6 +95,34 @@ export default class UserList extends Component {
         </>
       ),
     },
+    {
+      id: "id",
+      label: "Ạction",
+      props: {
+        className: "text-center",
+      },
+      renderCell: (id) => (
+        <div className="d-flex justify-content-around align-items-center">
+          <NavLink to={`/update/${id}`}>
+            <button
+              type="button"
+              title="Update user"
+              className="btn btn-outline-dark rounded-5"
+            >
+              <i className="fa-solid fa-pen"></i>
+            </button>
+          </NavLink>
+          <button
+            type="button"
+            title="Remove user"
+            className="btn btn-outline-dark rounded-5"
+            // onClick={this.handleRemoveUser(id)}
+          >
+            <i className="fa-solid fa-trash"></i>
+          </button>
+        </div>
+      ),
+    },
   ];
 
   async getListUser(_skip, _limit) {
@@ -111,7 +140,6 @@ export default class UserList extends Component {
         currentPage: Math.floor(_skip / _limit),
       });
     } catch (error) {
-      console.log("error", error);
       this.setState((pre) => ({ ...pre, error: error.message }));
     }
     this.setState((pre) => ({ ...pre, loading: false }));
@@ -133,7 +161,6 @@ export default class UserList extends Component {
   handleChangeLimit(_limit) {}
 
   render() {
-    console.log("this.state", this.state);
     const { customers, loading, error, currentPage, totalPage, limit } =
       this.state;
     return (
@@ -167,7 +194,7 @@ export default class UserList extends Component {
                   Array.isArray(customers) &&
                   customers.map((customer, index) => (
                     <TableRow
-                      key={customer.id}
+                      key={`${customer.id}_${index}`}
                       columns={this.columns}
                       data={{ ...customer, index }}
                     />
@@ -180,16 +207,20 @@ export default class UserList extends Component {
                     <div className="d-flex justify-content-between align-items-center">
                       <div>
                         <button
+                          type="button"
+                          className="btn btn-secondary"
                           disabled={currentPage === 0}
                           onClick={this.handlePagination(currentPage - 1)}
                         >
-                          previous
+                          <i className="fa-solid fa-angle-left"></i>
                         </button>
                         <button
+                          type="button"
+                          className="btn btn-secondary"
                           disabled={!totalPage || currentPage === totalPage - 1}
                           onClick={this.handlePagination(currentPage + 1)}
                         >
-                          next
+                          <i className="fa-solid fa-angle-right"></i>
                         </button>
                       </div>
                       <TableFooter

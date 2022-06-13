@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import fetcher from "../../services/fetcher";
 import UserForm from "../Form";
-import { withRouter } from "react-router-dom";
+import withRouter from "../../helpers/withRouter";
 class CreateUser extends Component {
   constructor(props) {
     super(props);
@@ -17,12 +17,13 @@ class CreateUser extends Component {
 
   async componentDidMount() {
     const { id } = this.props.match.params;
+    console.log('this.props.match', this.props.match)
     if (id) {
       document.title = "Update user";
       this.setState((pre) => ({ ...pre, loading: true }));
       const initialValues = await this.fetchUserDetail(id);
       this.setState({ initialValues, loading: false });
-    } else document.title = "Create New User";
+    } else document.title = "Create new user";
   }
   render() {
     const { initialValues, loading } = this.state;

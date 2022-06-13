@@ -19,9 +19,9 @@ export default class TableFooter extends Component {
       handleToggle();
     };
     return (
-      <div class="dropup-center dropup">
+      <div className="dropup-center dropup">
         <button
-          class="btn btn-secondary dropdown-toggle"
+          className="btn btn-secondary dropdown-toggle"
           type="button"
           id="dropupCenterBtn"
           data-bs-toggle="dropdown"
@@ -31,13 +31,13 @@ export default class TableFooter extends Component {
           {currentLimit}
         </button>
         <ul
-          class={`dropdown-menu dropdown-menu-dark ${show ? "show" : ""}`}
+          className={`dropdown-menu dropdown-menu-dark ${show ? "show" : ""}`}
           style={{ minWidth: "unset", inset: "auto auto 0px 0px" }}
         >
-          {limitOptions.map((value) => (
-            <li>
+          {limitOptions.map((value, idx) => (
+            <li key={`${value}_${idx}`}>
               <button
-                class={`dropdown-item ${
+                className={`dropdown-item ${
                   currentLimit === value ? "active" : ""
                 }`}
                 onClick={handleSelectOption(value)}

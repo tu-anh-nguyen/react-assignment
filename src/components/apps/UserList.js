@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { withRouter } from "react-router-dom";
+import withRouter from "../../helpers/withRouter";
 import List from "../List";
 
 class UserList extends Component {

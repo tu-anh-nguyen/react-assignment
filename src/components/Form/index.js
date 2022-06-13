@@ -6,7 +6,8 @@ import * as yup from "yup";
 import Select from "./Select";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import Divider from "./Divider";
-
+import poster from "../../services/poster";
+import withRouter from "../../helpers/withRouter";
 class Form extends Component {
   genders = [
     { value: "male", label: "Male" },
@@ -25,7 +26,6 @@ class Form extends Component {
       setFieldValue,
       isSubmitting,
     } = this.props;
-    console.log("this.props", this.props);
     const handleOnChangeInput = (event) => {
       const { name, value } = event.target;
       setFieldError(name, undefined);
@@ -267,7 +267,7 @@ class Form extends Component {
               />
             </div>
           </div>
-          <div class="d-grid gap-2 col-10 mx-auto">
+          <div className="d-grid gap-2 col-10 mx-auto">
             <button
               disabled={isSubmitting}
               type="submit"
@@ -284,7 +284,6 @@ class Form extends Component {
 
 const formikForm = withFormik({
   mapPropsToValues(props) {
-    console.log("props", props);
     const { initialValues } = props;
     return {
       id: initialValues.id || "",
@@ -331,14 +330,37 @@ const formikForm = withFormik({
     age: yup.number().moreThan(0, "Must be greater than 0"),
   }),
   validateOnChange: false,
-  handleSubmit: (values, props) => {
-    console.log("props", props);
+  handleSubmit: async (values, props) => {
     const { setSubmitting, resetForm, setStatus } = props;
-    setTimeout(() => {
+    const body = {
+      username: values.username,
+      password: values.password,
+      firstName: values.firstName,
+      lastName: values.lastName,
+      maidenName: values.maidenName,
+      gender: values.gender,
+      email: values.email,
+      phone: values.phone,
+      birthDate: moment(values.birthDate).format("yyyy-mm-dd"),
+      address: values.address,
+      city: values.city,
+      postalCode: values.postalCode,
+      state: values.state,
+      age: values.age,
+    };
+    try {
+      const { data: resp } = await poster("/users/add", body);
+      if (!resp.id) {
+        return;
+      }
       setStatus(true);
-      setSubmitting(false);
-    }, 1222);
+      this.props.match.navigate(-1);
+      resetForm();
+    } catch (error) {
+      throw Error(error)
+    }
+    setSubmitting(false);
   },
 })(Form);
 
-export default formikForm;
+export default withRouter(formikForm);

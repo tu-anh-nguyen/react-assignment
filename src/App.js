@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Link, Switch as Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Header from "./components/Header";
 // import Home from "./Home";
@@ -9,16 +9,16 @@ import Header from "./components/Header";
 // import restricted from "./Restricted";
 import routes from "./routes";
 const App = () => (
-  <BrowserRouter>
+  <>
     <Header />
-    <main>
+    <BrowserRouter>
       <Routes>
         {routes.map(({ path, element, exact }, idx) => (
-          <Route key={idx} exact={exact} path={path} component={element} />
+          <Route key={idx} exact={exact} path={path} element={element} />
         ))}
       </Routes>
-    </main>
-  </BrowserRouter>
+    </BrowserRouter>
+  </>
 );
 
 export default App;
