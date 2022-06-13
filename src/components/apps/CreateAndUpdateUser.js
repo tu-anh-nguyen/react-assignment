@@ -1,0 +1,46 @@
+import React, { Component } from "react";
+import fetcher from "../../services/fetcher";
+import UserForm from "../Form";
+import { withRouter } from "react-router-dom";
+class CreateUser extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      initialValues: {},
+      loading: false,
+    };
+  }
+  async fetchUserDetail(id) {
+    const data = await fetcher(`/users/${id}`);
+    return data.data;
+  }
+
+  async componentDidMount() {
+    const { id } = this.props.match.params;
+    if (id) {
+      document.title = "Update user";
+      this.setState((pre) => ({ ...pre, loading: true }));
+      const initialValues = await this.fetchUserDetail(id);
+      this.setState({ initialValues, loading: false });
+    } else document.title = "Create New User";
+  }
+  render() {
+    const { initialValues, loading } = this.state;
+    if (loading) {
+      return (
+        <div className="d-flex align-items-center justify-content-center py-4">
+          <div className="spinner-border text-primary" role="status" />
+          <span className="sr-only text-primary fs-5">Loading...</span>
+        </div>
+      );
+    }
+    return (
+      <UserForm
+        key={JSON.stringify(initialValues)}
+        initialValues={initialValues}
+      />
+    );
+  }
+}
+
+export default withRouter(CreateUser);
