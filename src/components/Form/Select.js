@@ -1,37 +1,53 @@
-import React, { Component } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 
-export default class Select extends Component {
-  render() {
-    const { label, required, error, id, option, value, name, onChange } =
-      this.props;
-    return (
-      <div className="form-group">
-        <label className="mb-1 fw-bold form-label" htmlFor={id}>
-          {label}
-          {required && <span className="text-danger"> *</span>}
-        </label>
-        <select
-          className={`form-select ${error ? "is-invalid" : ""}`}
-          id={id}
-          name={name}
-          onChange={onChange}
-          value={value}
-        >
-          <option disabled value="">
-            Choose...
+const Select = (props) => {
+  const { label, required, error, id, option, value, name, onChange } = props;
+  return (
+    <div className="form-group">
+      <label className="mb-1 fw-bold form-label" htmlFor={id}>
+        {label}
+        {required && <span className="text-danger"> *</span>}
+      </label>
+      <select
+        className={`form-select ${error ? "is-invalid" : ""}`}
+        id={id}
+        name={name}
+        onChange={onChange}
+        value={value}
+      >
+        <option disabled value="">
+          Choose...
+        </option>
+        {option.map(({ value, label }, idx) => (
+          <option value={value} key={`${value}_${id}`}>
+            {label}
           </option>
-          {option.map(({ value, label }, idx) => (
-            <option value={value} key={`${value}_${id}`}>
-              {label}
-            </option>
-          ))}
-        </select>
-        {error ? (
-          <small className="invalid-feedback">{error}</small>
-        ) : (
-          <div style={{ height: 25 }} />
-        )}
-      </div>
-    );
-  }
-}
+        ))}
+      </select>
+      {error ? (
+        <small className="invalid-feedback">{error}</small>
+      ) : (
+        <div style={{ height: 25 }} />
+      )}
+    </div>
+  );
+};
+
+Select.propTypes = {
+  label: PropTypes.string,
+  required: PropTypes.bool,
+  error: PropTypes.string,
+  id: PropTypes.string,
+  option: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.any,
+      name: PropTypes.string,
+    })
+  ),
+  value: PropTypes.any,
+  name: PropTypes.string,
+  onChange: PropTypes.func,
+};
+
+export default Select;

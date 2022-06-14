@@ -1,11 +1,14 @@
-import React, { Component } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 
-export default class index extends Component {
-  render() {
-    return (
-      <div className="alert alert-danger" role="alert">
-        {this.props.message}
-      </div>
-    );
-  }
-}
+const ErrorComponent = ({ message }) => (
+  <div className="alert alert-danger" role="alert">
+    {message}
+  </div>
+);
+
+ErrorComponent.propTypes = {
+  message: PropTypes.string,
+};
+
+export default ErrorComponent;

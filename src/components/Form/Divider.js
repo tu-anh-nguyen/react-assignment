@@ -1,10 +1,12 @@
-import React, { Component } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 
-export default class Divider extends Component {
-  render() {
-    const { children } = this.props;
-    return (
-      <p className="text-uppercase text-primary fw-bold fs-5">{children}</p>
-    );
-  }
-}
+const Divider = ({ children }) => (
+  <p className="text-uppercase text-primary fw-bold fs-5">{children}</p>
+);
+
+Divider.propTypes = {
+  children: PropTypes.any,
+};
+
+export default Divider;
