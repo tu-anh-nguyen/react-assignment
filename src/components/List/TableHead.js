@@ -17,10 +17,17 @@ export default class TableHead extends Component {
     const { columns } = this.props;
     return (
       <thead
-        className="thead-light sticky-top bg-secondary text-light"
+        className="thead-light sticky-top bg-primary text-light"
         style={{ top: 60 }}
       >
-        <tr>  
+        <tr className="bg-white">
+          <td align="center" colspan={columns.length}>
+            <h2 className="text-center text-uppercase py-3 fw-bold text-dark">
+              User list Management
+            </h2>
+          </td>
+        </tr>
+        <tr>
           {columns.map(({ id, label, props }) => (
             <th scope="col" {...props} key={`${id}_${label}`}>
               {label}

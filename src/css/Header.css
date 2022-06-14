@@ -25,7 +25,8 @@ nav ul li .nav-link:not(.active):hover {
   color: #ffffff;
 }
 
-nav ul li .nav-link:hover::after {
+nav ul li .nav-link:not(active):hover::after,
+nav ul li .active::after {
   content: "";
   position: absolute;
   width: 80%;
@@ -44,7 +45,7 @@ nav ul li .nav-link:not(.active)::after {
   color: white;
 }
 
-nav ul li .nav-link::after {
+nav ul li .active::after {
   background-color: #1505fc;
   color: #1505fc;
 }

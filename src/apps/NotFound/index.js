@@ -20,7 +20,7 @@ export default class NoPage extends Component {
             changed or is temporarily unavailable
           </p>
           <Link to="/">
-            <button type="button" class="btn btn-info">
+            <button type="button" class="btn btn-outline-info">
               Back to homepage
             </button>
           </Link>

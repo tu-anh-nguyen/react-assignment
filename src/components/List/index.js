@@ -6,7 +6,8 @@ import deleter from "../../services/deleter";
 import TableFooter from "./TableFooter";
 import TableHead from "./TableHead";
 import TableRow from "./TableRow";
-
+import TablePagination from "./TablePagination";
+import { ErrorComponent, LoadingComponent } from "../common";
 const defaultPaging = {
   skip: 0,
   limit: 10,
@@ -19,7 +20,7 @@ class UserList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentPage: 0,
+      currentPageIdx: 0,
       totalPage: 0,
       customers: [],
       skip: defaultPaging.skip,
@@ -39,6 +40,7 @@ class UserList extends Component {
     {
       id: "image",
       label: "Avatar",
+      props: { className: "text-center" },
       renderCell: (val) => (
         <div className="d-flex justify-content-center">
           <img
@@ -134,7 +136,7 @@ class UserList extends Component {
         skip: _skip,
         limit: _limit,
         totalPage: resp.total / _limit,
-        currentPage: Math.floor(_skip / _limit),
+        currentPageIdx: Math.floor(_skip / _limit),
       });
     } catch (error) {
       this.setState((pre) => ({ ...pre, error: error.message }));
@@ -174,34 +176,23 @@ class UserList extends Component {
     };
   }
   render() {
-    const { customers, loading, error, currentPage, totalPage, limit } =
+    const { customers, loading, error, currentPageIdx, totalPage, limit } =
       this.state;
     return (
-      <div className="container-lg overflow-auto">
-        <h2 className="text-center text-uppercase py-3 fw-bold">
-          User list Management
-        </h2>
+      <div className="container-lg">
         <table className="table table-hover align-middle">
           <TableHead columns={this.columns} />
           <tbody>
             {loading ? (
               <tr className="text-center">
                 <td colSpan={this.columns.length}>
-                  <div className="d-flex align-items-center justify-content-center py-4">
-                    <div
-                      className="spinner-border text-primary"
-                      role="status"
-                    />
-                    <span className="sr-only text-primary fs-5">
-                      Loading...
-                    </span>
-                  </div>
+                  <LoadingComponent />
                 </td>
               </tr>
             ) : error ? (
               <tr className="text-center">
                 <td colSpan={this.columns.length}>
-                  <h6>{error}</h6>
+                  <ErrorComponent message={error} />
                 </td>
               </tr>
             ) : (
@@ -219,26 +210,16 @@ class UserList extends Component {
             <tr>
               <td colSpan={this.columns.length}>
                 <div className="d-flex justify-content-between align-items-center">
-                  <div>
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      disabled={currentPage === 0}
-                      onClick={this.handlePagination(currentPage - 1)}
-                    >
-                      <i className="fa-solid fa-angle-left"></i>
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      disabled={!totalPage || currentPage === totalPage - 1}
-                      onClick={this.handlePagination(currentPage + 1)}
-                    >
-                      <i className="fa-solid fa-angle-right"></i>
-                    </button>
-                  </div>
+                  <TablePagination
+                    currentPageIdx={currentPageIdx}
+                    totalPage={totalPage}
+                    loading={loading}
+                    handlePagination={(_pageIdx) =>
+                      this.handlePagination(_pageIdx)
+                    }
+                  />
                   <TableFooter
-                    limitOptions={[5, 10, 20]}
+                    limitOptions={[5, 10, 20, 50]}
                     currentLimit={limit}
                     handleChangeLimit={(_limit) =>
                       this.handleChangeLimit(_limit)

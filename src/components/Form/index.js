@@ -36,7 +36,7 @@ class Form extends Component {
     const isFirstSubmit = !submitCount; // submitCount default = 0
     return (
       <div className="container-sm" style={{ maxWidth: 800 }}>
-        <h2 className="text-uppercase fw-bold text-center">
+        <h2 className="text-uppercase fw-bold text-center py-4">
           {isNewUser ? "create a new user" : "update user"}
         </h2>
         <div
