@@ -1,4 +1,4 @@
-import { UserList, CreateAndUpdateUser } from "../components/apps";
+import { UserList, CreateAndUpdateUser, NotFound } from "../apps";
 
 const routes = [
   { path: "/", element: <UserList />, exact: true },
@@ -7,6 +7,10 @@ const routes = [
     path: "/update/:id",
     element: <CreateAndUpdateUser />,
     exact: true,
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ];
 

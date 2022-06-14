@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import fetcher from "../../services/fetcher";
-import UserForm from "../Form";
-import withRouter from "../../helpers/withRouter";
+import fetcher from "../services/fetcher";
+import UserForm from "../components/Form";
+import withRouter from "../helpers/withRouter";
 class CreateUser extends Component {
   constructor(props) {
     super(props);
@@ -17,7 +17,6 @@ class CreateUser extends Component {
 
   async componentDidMount() {
     const { id } = this.props.match.params;
-    console.log('this.props.match', this.props.match)
     if (id) {
       document.title = "Update user";
       this.setState((pre) => ({ ...pre, loading: true }));

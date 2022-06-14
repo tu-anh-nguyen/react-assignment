@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import withRouter from "../../helpers/withRouter";
-import List from "../List";
+import List from "../components/List";
 
 class UserList extends Component {
   componentDidMount() {
@@ -12,4 +11,4 @@ class UserList extends Component {
   }
 }
 
-export default withRouter(UserList);
+export default UserList;

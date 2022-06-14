@@ -7,6 +7,7 @@ import Select from "./Select";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import Divider from "./Divider";
 import poster from "../../services/poster";
+import putter from "../../services/putter";
 import withRouter from "../../helpers/withRouter";
 class Form extends Component {
   genders = [
@@ -331,8 +332,15 @@ const formikForm = withFormik({
   }),
   validateOnChange: false,
   handleSubmit: async (values, props) => {
-    const { setSubmitting, resetForm, setStatus } = props;
+    const {
+      setSubmitting,
+      resetForm,
+      setStatus,
+      props: { match } = {}, // match is props of withRouter, we use this to go back previous page.
+    } = props;
+    const id = values.id;
     const body = {
+      ...(id && { id }),
       username: values.username,
       password: values.password,
       firstName: values.firstName,
@@ -342,22 +350,31 @@ const formikForm = withFormik({
       email: values.email,
       phone: values.phone,
       birthDate: moment(values.birthDate).format("yyyy-mm-dd"),
-      address: values.address,
-      city: values.city,
-      postalCode: values.postalCode,
-      state: values.state,
+      address: {
+        address: values.address,
+        city: values.city,
+        postalCode: values.postalCode,
+        state: values.state,
+      },
       age: values.age,
     };
     try {
-      const { data: resp } = await poster("/users/add", body);
-      if (!resp.id) {
+      let resp;
+      if (!id) {
+        const { data } = await poster("/users/add", body);
+        resp = data;
+      } else {
+        const { data } = await putter(`users/${id}`, body);
+        resp = data;
+      }
+      if (!resp?.id) {
         return;
       }
       setStatus(true);
-      this.props.match.navigate(-1);
+      match.navigate(-1);
       resetForm();
     } catch (error) {
-      throw Error(error)
+      throw Error(error);
     }
     setSubmitting(false);
   },

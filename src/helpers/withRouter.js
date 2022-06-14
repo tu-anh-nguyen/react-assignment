@@ -7,7 +7,6 @@ function withRouter(Component) {
     let params = useParams();
     return <Component {...props} match={{ location, navigate, params }} />;
   }
-
   return ComponentWithRouterProp;
 }
 

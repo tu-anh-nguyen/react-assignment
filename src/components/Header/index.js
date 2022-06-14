@@ -1,25 +1,24 @@
 import React, { Component } from "react";
+import { NavLink } from "react-router-dom";
+import withRouter from "../../helpers/withRouter";
 
-export default class Header extends Component {
+class Header extends Component {
   render() {
     return (
       <div className="container-xl sticky-top mb-2">
-        <nav className="navbar navbar-expand-lg bg-light w-100">
+        <nav className="navbar navbar-expand bg-secondary w-100">
           <div className="container-fluid">
-            <div
-              className="collapse navbar-collapse"
-              id="navbarSupportedContent"
-            >
-              <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+            <div className="collapse navbar-collapse">
+              <ul className="navbar-nav me-auto">
                 <li className="nav-item">
-                  <a className="nav-link" href="/">
+                  <NavLink className="nav-link px-3" to="/">
                     Home
-                  </a>
+                  </NavLink>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link" href="/create">
+                  <NavLink className="nav-link px-3" to="/create">
                     Create new user
-                  </a>
+                  </NavLink>
                 </li>
               </ul>
               <form className="d-flex" role="search">
@@ -29,7 +28,7 @@ export default class Header extends Component {
                   placeholder="Search"
                   aria-label="Search"
                 />
-                <button className="btn btn-outline-success" type="submit">
+                <button className="btn btn-light" type="submit">
                   Search
                 </button>
               </form>
@@ -40,3 +39,5 @@ export default class Header extends Component {
     );
   }
 }
+
+export default withRouter(Header);

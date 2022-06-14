@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
+import withRouter from "../../helpers/withRouter";
 import fetcher from "../../services/fetcher";
+import deleter from "../../services/deleter";
 import TableFooter from "./TableFooter";
 import TableHead from "./TableHead";
 import TableRow from "./TableRow";
@@ -13,7 +15,7 @@ const defaultPaging = {
 const noAvatarUrl =
   "https://tse2.mm.bing.net/th/id/OIP.1QE_bLwBgy4tLarLPJYrEAHaHa?pid=ImgDet&rs=1";
 
-export default class UserList extends Component {
+class UserList extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -79,25 +81,20 @@ export default class UserList extends Component {
     },
     { id: "email", label: "Email" },
     {
-      id: "company",
-      label: "Working Details",
+      id: "address",
+      label: "Address",
       renderCell: (val) => (
         <>
-          <p>
-            <b>Position:</b> {val.title}
-          </p>
-          <p>
-            <b>At company:</b> {val.name}
-          </p>
-          <p>
-            <b>Department:</b> {val.department}
-          </p>
+          {val.address}
+          {val.city ? `, ${val.city}` : ""}
+          {val.state ? `, ${val.state}` : ""}
+          {val.postalCode ? `, ${val.postalCode}` : ""}
         </>
       ),
     },
     {
       id: "id",
-      label: "Ạction",
+      label: "Action",
       props: {
         className: "text-center",
       },
@@ -107,7 +104,7 @@ export default class UserList extends Component {
             <button
               type="button"
               title="Update user"
-              className="btn btn-outline-dark rounded-5"
+              className="btn btn-outline-dark rounded-5 mx-2"
             >
               <i className="fa-solid fa-pen"></i>
             </button>
@@ -116,7 +113,7 @@ export default class UserList extends Component {
             type="button"
             title="Remove user"
             className="btn btn-outline-dark rounded-5"
-            // onClick={this.handleRemoveUser(id)}
+            onClick={this.handleRemoveUser(id)}
           >
             <i className="fa-solid fa-trash"></i>
           </button>
@@ -136,13 +133,22 @@ export default class UserList extends Component {
         customers: resp.users,
         skip: _skip,
         limit: _limit,
-        totalPage: resp.total,
+        totalPage: resp.total / _limit,
         currentPage: Math.floor(_skip / _limit),
       });
     } catch (error) {
       this.setState((pre) => ({ ...pre, error: error.message }));
     }
     this.setState((pre) => ({ ...pre, loading: false }));
+  }
+
+  async removeUser(_id) {
+    try {
+      await deleter(`/users/${_id}`);
+      this.getListUser(0, this.state.limit);
+    } catch (error) {
+      this.setState((pre) => ({ ...pre, error: error.message }));
+    }
   }
 
   componentDidMount() {
@@ -158,86 +164,94 @@ export default class UserList extends Component {
     };
   }
 
-  handleChangeLimit(_limit) {}
+  handleChangeLimit(_limit) {
+    this.getListUser(0, _limit);
+  }
 
+  handleRemoveUser(_id) {
+    return (_) => {
+      this.removeUser(_id);
+    };
+  }
   render() {
     const { customers, loading, error, currentPage, totalPage, limit } =
       this.state;
     return (
-      <div>
-        <div className="container">
-          <div className="row">
-            <table className="table table-hover align-middle">
-              <TableHead columns={this.columns} />
-              <tbody>
-                {loading ? (
-                  <tr className="text-center">
-                    <td colSpan={this.columns.length}>
-                      <div className="d-flex align-items-center justify-content-center py-4">
-                        <div
-                          className="spinner-border text-primary"
-                          role="status"
-                        />
-                        <span className="sr-only text-primary fs-5">
-                          Loading...
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
-                ) : error ? (
-                  <tr className="text-center">
-                    <td colSpan={this.columns.length}>
-                      <h6>{error}</h6>
-                    </td>
-                  </tr>
-                ) : (
-                  Array.isArray(customers) &&
-                  customers.map((customer, index) => (
-                    <TableRow
-                      key={`${customer.id}_${index}`}
-                      columns={this.columns}
-                      data={{ ...customer, index }}
+      <div className="container-lg overflow-auto">
+        <h2 className="text-center text-uppercase py-3 fw-bold">
+          User list Management
+        </h2>
+        <table className="table table-hover align-middle">
+          <TableHead columns={this.columns} />
+          <tbody>
+            {loading ? (
+              <tr className="text-center">
+                <td colSpan={this.columns.length}>
+                  <div className="d-flex align-items-center justify-content-center py-4">
+                    <div
+                      className="spinner-border text-primary"
+                      role="status"
                     />
-                  ))
-                )}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td colSpan={this.columns.length}>
-                    <div className="d-flex justify-content-between align-items-center">
-                      <div>
-                        <button
-                          type="button"
-                          className="btn btn-secondary"
-                          disabled={currentPage === 0}
-                          onClick={this.handlePagination(currentPage - 1)}
-                        >
-                          <i className="fa-solid fa-angle-left"></i>
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn-secondary"
-                          disabled={!totalPage || currentPage === totalPage - 1}
-                          onClick={this.handlePagination(currentPage + 1)}
-                        >
-                          <i className="fa-solid fa-angle-right"></i>
-                        </button>
-                      </div>
-                      <TableFooter
-                        limitOptions={[5, 10, 20]}
-                        currentLimit={limit}
-                        handleChangeLimit={(_limit) =>
-                          this.getListUser(0, _limit)
-                        }
-                      />
-                    </div>
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </div>
+                    <span className="sr-only text-primary fs-5">
+                      Loading...
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            ) : error ? (
+              <tr className="text-center">
+                <td colSpan={this.columns.length}>
+                  <h6>{error}</h6>
+                </td>
+              </tr>
+            ) : (
+              Array.isArray(customers) &&
+              customers.map((customer, index) => (
+                <TableRow
+                  key={`${customer.id}_${index}`}
+                  columns={this.columns}
+                  data={{ ...customer, index }}
+                />
+              ))
+            )}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan={this.columns.length}>
+                <div className="d-flex justify-content-between align-items-center">
+                  <div>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      disabled={currentPage === 0}
+                      onClick={this.handlePagination(currentPage - 1)}
+                    >
+                      <i className="fa-solid fa-angle-left"></i>
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      disabled={!totalPage || currentPage === totalPage - 1}
+                      onClick={this.handlePagination(currentPage + 1)}
+                    >
+                      <i className="fa-solid fa-angle-right"></i>
+                    </button>
+                  </div>
+                  <TableFooter
+                    limitOptions={[5, 10, 20]}
+                    currentLimit={limit}
+                    handleChangeLimit={(_limit) =>
+                      this.handleChangeLimit(_limit)
+                    }
+                  />
+                </div>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
     );
   }
 }
+
+export default withRouter(UserList);
