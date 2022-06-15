@@ -1,39 +1,82 @@
-import React, { Component } from "react";
-import { NavLink } from "react-router-dom";
-import withRouter from "../../helpers/withRouter";
-import fetcher from "../../services/fetcher";
+import React, { useCallback, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
+import { addToast } from "../../redux/actions";
+import { ToastType } from "../../redux/constants/toastConstant";
 import deleter from "../../services/deleter";
-import TableFooter from "./TableFooter";
-import TableHead from "./TableHead";
-import TableRow from "./TableRow";
-import TablePagination from "./TablePagination";
+import fetcher from "../../services/fetcher";
 import { ErrorComponent, LoadingComponent } from "../common";
-const defaultPaging = {
-  skip: 0,
-  limit: 10,
-};
+import RowLimit from "./RowLimit";
+import TableHead from "./TableHead";
+import TablePagination from "./TablePagination";
+import TableRow from "./TableRow";
 
 const noAvatarUrl =
   "https://tse2.mm.bing.net/th/id/OIP.1QE_bLwBgy4tLarLPJYrEAHaHa?pid=ImgDet&rs=1";
 
-  
-class UserList extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      currentPageIdx: 0,
-      totalPage: 0,
-      customers: [],
-      skip: defaultPaging.skip,
-      limit: defaultPaging.limit,
-    };
-  }
+export default function List() {
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [totalPage, setTotalPage] = useState(0);
+  const [currentPageIdx, setCurrentPageIdx] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [skip, setSkip] = useState(0);
 
-  columns = [
+  const dispatch = useDispatch();
+
+  const getListUser = useCallback(async (_skip, _limit) => {
+    setLoading(true);
+    try {
+      const { data: resp } = await fetcher("/users", {
+        skip: _skip,
+        limit: _limit,
+      });
+      setCustomers(resp.users);
+      setSkip(_skip);
+      setLimit(_limit);
+      setTotalPage(resp.total / _limit);
+      setCurrentPageIdx(Math.floor(_skip / _limit));
+    } catch (error) {
+      setError(error.message);
+    }
+    setLoading(false);
+  }, []);
+
+  const removeUser = async (_id) => {
+    try {
+      await deleter(`/users/${_id}`);
+      await getListUser(skip, limit);
+      dispatch(
+        addToast({
+          type: ToastType.SUCCESS,
+          title: "Removed user successfully!",
+          description: "",
+        })
+      );
+    } catch (error) {
+      dispatch(
+        addToast({
+          type: ToastType.ERROR,
+          title: "Something went wrong",
+          description: error?.message,
+        })
+      );
+    }
+  };
+
+  const handlePagination = (_pageIndex) => () => {
+    const skip = _pageIndex * limit;
+    setSkip(skip);
+  };
+
+  const handleRemoveUser = (_id) => (_) => removeUser(_id);
+
+  const columns = [
     {
       id: "index",
       label: "No.",
-      renderCell: (idx) => idx + 1 + this.state.skip,
+      renderCell: (idx) => idx + 1 + skip,
       props: {
         className: "text-center",
       },
@@ -67,9 +110,7 @@ class UserList extends Component {
       id: "age",
       label: "Age",
       props: {
-        style: {
-          textAlign: "center",
-        },
+        className: "text-center",
       },
     },
     {
@@ -103,7 +144,7 @@ class UserList extends Component {
       },
       renderCell: (id) => (
         <div className="d-flex justify-content-around align-items-center">
-          <NavLink to={`/update/${id}`}>
+          <Link to={`/update/${id}`}>
             <button
               type="button"
               title="Update user"
@@ -111,12 +152,12 @@ class UserList extends Component {
             >
               <i className="fa-solid fa-pen"></i>
             </button>
-          </NavLink>
+          </Link>
           <button
             type="button"
             title="Remove user"
             className="btn btn-outline-dark rounded-5"
-            onClick={this.handleRemoveUser(id)}
+            onClick={handleRemoveUser(id)}
           >
             <i className="fa-solid fa-trash"></i>
           </button>
@@ -125,115 +166,58 @@ class UserList extends Component {
     },
   ];
 
-  async getListUser(_skip, _limit) {
-    this.setState((pre) => ({ ...pre, loading: true }));
-    try {
-      const { data: resp } = await fetcher("/users", {
-        skip: _skip,
-        limit: _limit,
-      });
-      this.setState({
-        customers: resp.users,
-        skip: _skip,
-        limit: _limit,
-        totalPage: resp.total / _limit,
-        currentPageIdx: Math.floor(_skip / _limit),
-      });
-    } catch (error) {
-      this.setState((pre) => ({ ...pre, error: error.message }));
-    }
-    this.setState((pre) => ({ ...pre, loading: false }));
-  }
+  useEffect(() => {
+    getListUser(skip, limit);
+  }, [skip, limit, getListUser]);
 
-  async removeUser(_id) {
-    try {
-      await deleter(`/users/${_id}`);
-      this.getListUser(0, this.state.limit);
-    } catch (error) {
-      this.setState((pre) => ({ ...pre, error: error.message }));
-    }
-  }
-
-  componentDidMount() {
-    const { skip, limit } = this.state;
-    this.getListUser(skip, limit);
-  }
-
-  handlePagination(_pageIndex) {
-    return () => {
-      const { limit } = this.state;
-      const skip = _pageIndex * limit;
-      this.getListUser(skip, limit);
-    };
-  }
-
-  handleChangeLimit(_limit) {
-    this.getListUser(0, _limit);
-  }
-
-  handleRemoveUser(_id) {
-    return (_) => {
-      this.removeUser(_id);
-    };
-  }
-  render() {
-    const { customers, loading, error, currentPageIdx, totalPage, limit } =
-      this.state;
-    return (
-      <div className="container-lg">
-        <table className="table table-hover align-middle">
-          <TableHead columns={this.columns} />
-          <tbody>
-            {loading ? (
-              <tr className="text-center">
-                <td colSpan={this.columns.length}>
-                  <LoadingComponent />
-                </td>
-              </tr>
-            ) : error ? (
-              <tr className="text-center">
-                <td colSpan={this.columns.length}>
-                  <ErrorComponent message={error} />
-                </td>
-              </tr>
-            ) : (
-              Array.isArray(customers) &&
-              customers.map((customer, index) => (
-                <TableRow
-                  key={`${customer.id}_${index}`}
-                  columns={this.columns}
-                  data={{ ...customer, index }}
-                />
-              ))
-            )}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colSpan={this.columns.length}>
-                <div className="d-flex justify-content-between align-items-center">
-                  <TablePagination
-                    currentPageIdx={currentPageIdx}
-                    totalPage={totalPage}
-                    loading={loading}
-                    handlePagination={(_pageIdx) =>
-                      this.handlePagination(_pageIdx)
-                    }
-                  />
-                  <TableFooter
-                    limitOptions={[5, 10, 20, 50]}
-                    currentLimit={limit}
-                    handleChangeLimit={(_limit) =>
-                      this.handleChangeLimit(_limit)
-                    }
-                  />
-                </div>
+  return (
+    <div className="container-lg">
+      <table className="table table-hover align-middle">
+        <TableHead columns={columns} />
+        <tbody>
+          {loading ? (
+            <tr className="text-center">
+              <td colSpan={columns.length}>
+                <LoadingComponent />
               </td>
             </tr>
-          </tfoot>
-        </table>
-      </div>
-    );
-  }
+          ) : error ? (
+            <tr className="text-center">
+              <td colSpan={columns.length}>
+                <ErrorComponent message={error} />
+              </td>
+            </tr>
+          ) : (
+            Array.isArray(customers) &&
+            customers.map((customer, index) => (
+              <TableRow
+                key={`${customer.id}_${index}`}
+                columns={columns}
+                data={{ ...customer, index }}
+              />
+            ))
+          )}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colSpan={columns.length}>
+              <div className="d-flex justify-content-between align-items-center">
+                <TablePagination
+                  currentPageIdx={currentPageIdx}
+                  totalPage={totalPage}
+                  loading={loading}
+                  handlePagination={handlePagination}
+                />
+                <RowLimit
+                  limitOptions={[5, 10, 20, 50]}
+                  currentLimit={limit}
+                  handleChangeLimit={setLimit}
+                />
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  );
 }
-
-export default withRouter(UserList);

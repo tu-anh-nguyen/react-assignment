@@ -1,11 +1,3 @@
-// import moment from "moment";
-// import React, { Component } from "react";
-// import Input from "./Input";
-// import Select from "./Select";
-// import { withFormik } from "formik";
-// import * as yup from "yup";
-// import { isValidPhoneNumber } from "libphonenumber-js";
-
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useFormik } from "formik";
@@ -18,6 +10,13 @@ import Divider from "./Divider";
 import Input from "./Input";
 import Select from "./Select";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import {
+  addCreatedUser,
+  addEditedUser,
+  addToast,
+} from "../../redux/actions";
+import { ToastType } from "../../redux/constants/toastConstant";
 
 const genders = [
   { value: "male", label: "Male" },
@@ -56,6 +55,7 @@ const Form = ({ initialValues }) => {
   const navigate = useNavigate();
   const [status, setStatus] = useState(false);
   const [submitCount, setSubmitCount] = useState(0);
+  const dispatch = useDispatch();
   const {
     values,
     errors,
@@ -112,19 +112,33 @@ const Form = ({ initialValues }) => {
         if (!id) {
           const { data } = await poster("/users/add", body);
           resp = data;
+          dispatch(addCreatedUser(resp));
         } else {
           const { data } = await putter(`users/${id}`, body);
           resp = data;
+          dispatch(addEditedUser(resp));
         }
+        dispatch(
+          addToast({
+            type: ToastType.SUCCESS,
+            title: isNewUser
+              ? "Created user sucessfully!"
+              : "Updated user sucessfully!",
+            description: "",
+          })
+        );
         console.log("resp", resp);
-        if (resp?.id) {
-          setStatus(true);
-        }
-        setStatus(true);
-        navigate(-1);
         resetForm();
+        navigate(-1);
       } catch (error) {
         setStatus(false);
+        dispatch(
+          addToast({
+            type: ToastType.ERROR,
+            title: "Something went wrong",
+            description: error?.message,
+          })
+        );
         throw Error(error);
       }
       setSubmitting(false);

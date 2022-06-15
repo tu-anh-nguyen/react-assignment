@@ -1,13 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const TableHead = ({ columns }) => (
+const TableHead = ({ columns = [] }) => (
   <thead
     className="thead-light sticky-top bg-primary text-light"
     style={{ top: 60 }}
   >
     <tr className="bg-white">
-      <td align="center" colspan={columns.length}>
+      <td align="center" colSpan={columns.length}>
         <h2 className="text-center text-uppercase py-3 fw-bold text-dark">
           User list Management
         </h2>

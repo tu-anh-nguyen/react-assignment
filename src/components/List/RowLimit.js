@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 
-export default function TableFooter({
+export default function RowLimit({
   limitOptions,
   currentLimit,
   handleChangeLimit,
@@ -50,7 +50,7 @@ export default function TableFooter({
   );
 }
 
-TableFooter.prototype = {
+RowLimit.prototype = {
   limitOptions: PropTypes.arrayOf(PropTypes.number),
   currentLimit: PropTypes.number,
   handleChangeLimit: PropTypes.func.isRequired,
