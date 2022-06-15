@@ -28,18 +28,18 @@ const Toast = ({ timeout = 3000 }) => {
 
   return (
     <div className={`${styles.container} ${styles.topRight}`}>
-      {toastlist.map((toast, i) => (
+      {toastlist.map(({ id, title, description, backgroundColor }, i) => (
         <div
           key={i}
           className={`${styles.notification} ${styles.toast} ${styles.topRight}`}
-          style={{ backgroundColor: toast.backgroundColor }}
+          style={{ backgroundColor: backgroundColor }}
         >
-          <button onClick={closeToast(toast.id)}>
+          <button onClick={closeToast(id)}>
             <i class="fa-solid fa-circle-xmark"></i>
           </button>
           <div className={styles.notificationBox}>
-            <p className={styles.title}>{toast.title}</p>
-            <p className={styles.description}>{toast.description}</p>
+            <p className={styles.title}>{title}</p>
+            <p className={styles.description}>{description}</p>
           </div>
         </div>
       ))}
