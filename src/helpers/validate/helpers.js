@@ -52,7 +52,8 @@ const validate = {
   }),
   date: (_message = "Invalid date") => ({
     handleValidate: (_value) => {
-      const isValidDate = _value instanceof Date && !isNaN(_value);
+      const date = new Date(_value)
+      const isValidDate = date instanceof Date && isFinite(date);
       return !isValidDate ? _message : "";
     },
     priority: 2,

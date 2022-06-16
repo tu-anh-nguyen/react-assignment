@@ -16,6 +16,7 @@ const withValidate = ({
         this.validateOnChange = validateOnChange;
         this.fields = Object.keys(this.initialValues);
         this.state = {
+          isSubmitting: false,
           errors: {},
           errorsOnSubmit: {},
           values: this.initialValues,
@@ -30,6 +31,10 @@ const withValidate = ({
         let { name: field, value } = event.target;
         this.setState(!touched);
         this.runValidate(field, value);
+      }
+
+      setSubmitting(_value) {
+        this.setState({ isSubmitting: _value });
       }
 
       handleChange(event) {
@@ -50,22 +55,27 @@ const withValidate = ({
       }
       handleSubmit(event) {
         event.preventDefault();
-        console.log(this.validate);
-        console.log("this.state.errorsOnSubmit", this.state.errorsOnSubmit);
+        this.setState({ isSubmitting: true });
         if (!this.validateOnChange) {
           this.fields.forEach((field) =>
             this.runValidate(field, this.state.values[field])
           );
         }
-        if (!this.state.isValid) return;
+        var isInvalid = !this.checkIsValid();
+        if (isInvalid) {
+          return;
+        }
+        this.setState({ isSubmitting: false });
         this.onSumit(this.state.values);
       }
-
+      checkIsValid() {
+        return Object.values(this.state.errors).some((err) => err);
+      }
       runValidate(field, value) {
-        let { values, errors, isValid } = this.state;
+        let { values, errors } = this.state;
         values[field] = value;
-        let validates = this.validate[field] || [];
-        let { error } = validates.reduce(
+        const validates = this.validate[field] || [];
+        const { error } = validates.reduce(
           (acc, validate = {}) => {
             const { handleValidate, priority } = validate;
             if (!acc.priority || !acc.error || acc.priority >= priority) {
@@ -77,18 +87,17 @@ const withValidate = ({
           { error: "" }
         );
         errors[field] = error;
-        isValid = isValid && !Boolean(error);
         this.setState({
-          isValid,
           errors,
           values,
         });
       }
 
-      mapStateToProps({ errors, values }) {
+      mapStateToProps({ errors, values, isSubmitting }) {
         return {
           errors,
           values,
+          isSubmitting,
           handleChange: this.handleChange.bind(this),
           handleSubmit: this.handleSubmit.bind(this),
           setFieldError: this.setFieldError.bind(this),
