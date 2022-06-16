@@ -1,14 +1,11 @@
 import moment from "moment";
 import React, { Component } from "react";
 import Input from "./Input";
-import { withFormik } from "formik";
-import * as yup from "yup";
 import Select from "./Select";
-import { isValidPhoneNumber } from "libphonenumber-js";
 import Divider from "./Divider";
 import poster from "../../services/poster";
 import putter from "../../services/putter";
-import withRouter from "../../helpers/withRouter";
+import { withValidate, withRouter, validateHelper } from "../../helpers";
 class Form extends Component {
   genders = [
     { value: "male", label: "Male" },
@@ -282,8 +279,7 @@ class Form extends Component {
     );
   }
 }
-
-const formikForm = withFormik({
+const formikForm = withValidate({
   mapPropsToValues(props) {
     const { initialValues } = props;
     return {
@@ -304,40 +300,61 @@ const formikForm = withFormik({
       age: initialValues.age || 0,
     };
   },
-  validationSchema: yup.object().shape({
-    username: yup.string().required("Username is required"),
-    password: yup.string().required("Password is required"),
-    firstName: yup.string().required("First name is required"),
-    lastName: yup.string().required("Last name is required"),
-    maidenName: yup.string(),
-    gender: yup.string().required("Gender is required"),
-    email: yup.string().email("Invalid email").required("Email is required"),
-    phone: yup
-      .string()
-      .required("Phone number is required")
-      .test("isValidPhoneNumber", "Invalid phone number", function (value) {
-        if (!value) return true;
-        const isValid = isValidPhoneNumber(value, this.parent.countryCode);
-        return isValid;
-      }),
-    birthDate: yup
-      .date()
-      .required("Birth date is required")
-      .max(new Date(), "Birthday is invalid"),
-    address: yup.string(),
-    city: yup.string(),
-    postalCode: yup.string(),
-    state: yup.string(),
-    age: yup.number().moreThan(0, "Must be greater than 0"),
-  }),
+
+  validate: {
+    username: [
+      validateHelper.string(),
+      validateHelper.required("Username is required"),
+    ],
+    password: [
+      validateHelper.string(),
+      validateHelper.required("Password is required"),
+    ],
+    firstName: [
+      validateHelper.string(),
+      validateHelper.required("Firstname is required"),
+    ],
+    lastName: [
+      validateHelper.string(),
+      validateHelper.required("Lastname is required"),
+    ],
+    maidenName: [validateHelper.string()],
+    gender: [
+      validateHelper.string(),
+      validateHelper.required("Gender is required"),
+    ],
+    email: [
+      validateHelper.string(),
+      validateHelper.email(),
+      validateHelper.required("Email is required"),
+    ],
+    phone: [
+      validateHelper.string(),
+      validateHelper.phone(),
+      validateHelper.required("Phone number is required"),
+    ],
+    birthDate: [
+      validateHelper.date(),
+      validateHelper.required("Birth date is required"),
+    ],
+    address: [validateHelper.string()],
+    city: [validateHelper.string()],
+    postalCode: [validateHelper.string()],
+    state: [validateHelper.string()],
+    age: [
+      validateHelper.number(),
+      validateHelper.greaterThan(0, "Must be greater than 0"),
+      validateHelper.required("Age is required"),
+    ],
+  },
   validateOnChange: false,
-  handleSubmit: async (values, props) => {
-    const {
-      setSubmitting,
-      resetForm,
-      setStatus,
-      props: { match } = {}, // match is props of withRouter, we use this to go back previous page.
-    } = props;
+  onSubmit: async (values, props = {}) => {
+    // const {
+    //   setSubmitting,
+    //   resetForm,
+    //   setStatus,
+    //   props: { match } = {}, // match is props of withRouter, we use this to go back previous page.
+    // } = props;
     const id = values.id;
     const body = {
       ...(id && { id }),
@@ -370,13 +387,13 @@ const formikForm = withFormik({
       if (!resp?.id) {
         return;
       }
-      setStatus(true);
-      match.navigate(-1);
-      resetForm();
+      // setStatus(true);
+      // match.navigate(-1);
+      // resetForm();
     } catch (error) {
       throw Error(error);
     }
-    setSubmitting(false);
+    // setSubmitting(false);
   },
 })(Form);
 
