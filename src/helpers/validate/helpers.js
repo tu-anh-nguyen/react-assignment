@@ -1,3 +1,5 @@
+import { isValidPhoneNumber } from "libphonenumber-js";
+
 /* eslint-disable no-useless-escape */
 const emailRegex =
   /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
@@ -26,7 +28,7 @@ const validate = {
       priority: 3,
     };
   },
-  greaterThan(_number, _message) {
+  moreThan(_number, _message) {
     return {
       handleValidate: (_value) =>
         _number >= _value
@@ -45,8 +47,8 @@ const validate = {
 
   phone: (_message = "Invalid phone number") => ({
     handleValidate: (_value) => {
-      const isValidEmail = emailRegex.test(_value);
-      return !isValidEmail ? _message : "";
+      const isValid = isValidPhoneNumber(_value)
+      return !isValid ? _message : "";
     },
     priority: 2,
   }),

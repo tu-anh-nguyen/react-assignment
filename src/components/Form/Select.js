@@ -5,7 +5,7 @@ export default class Select extends Component {
     const { label, required, error, id, option, value, name, onChange } =
       this.props;
     return (
-      <div className="form-group">
+      <div className="form-group mt-1">
         <label className="mb-1 fw-bold form-label" htmlFor={id}>
           {label}
           {required && <span className="text-danger"> *</span>}

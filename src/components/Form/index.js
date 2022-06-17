@@ -343,12 +343,12 @@ const formikForm = withValidate({
     state: [validateHelper.string()],
     age: [
       validateHelper.number(),
-      validateHelper.greaterThan(0, "Must be greater than 0"),
+      validateHelper.moreThan(0),
       validateHelper.required("Age is required"),
     ],
   },
   validateOnChange: false,
-  onSubmit: async (values, props = {}) => {
+  onSubmit: async (values, props) => {
     // const {
     //   setSubmitting,
     //   resetForm,
@@ -387,13 +387,12 @@ const formikForm = withValidate({
       if (!resp?.id) {
         return;
       }
-      // setStatus(true);
-      // match.navigate(-1);
-      // resetForm();
+      setTimeout(() => {
+        props.match.navigate("/");
+      }, 1000);
     } catch (error) {
       throw Error(error);
     }
-    // setSubmitting(false);
   },
 })(Form);
 

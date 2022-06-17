@@ -24,6 +24,7 @@ const withValidate = ({
         };
         this.mapStateToProps.bind(this);
         this.runValidate.bind(this);
+        this.handleSubmit.bind(this);
       }
 
       onBlur(event) {
@@ -53,7 +54,7 @@ const withValidate = ({
         values[_field] = _value;
         this.setState(values);
       }
-      handleSubmit(event) {
+      async handleSubmit(event) {
         event.preventDefault();
         this.setState({ isSubmitting: true });
         if (!this.validateOnChange) {
@@ -61,15 +62,20 @@ const withValidate = ({
             this.runValidate(field, this.state.values[field])
           );
         }
-        var isInvalid = !this.checkIsValid();
-        if (isInvalid) {
-          return;
+        var isInvalid = this.checkIsInvalid();
+        if (!isInvalid) {
+          await this.onSumit(this.state.values, this.props);
         }
         this.setState({ isSubmitting: false });
-        this.onSumit(this.state.values);
       }
-      checkIsValid() {
+      checkIsInvalid() {
         return Object.values(this.state.errors).some((err) => err);
+      }
+      resetForm() {
+        this.setState({
+          values: this.initialValues,
+          errors: {},
+        });
       }
       runValidate(field, value) {
         let { values, errors } = this.state;
@@ -102,6 +108,7 @@ const withValidate = ({
           handleSubmit: this.handleSubmit.bind(this),
           setFieldError: this.setFieldError.bind(this),
           setFieldValue: this.setFieldValue.bind(this),
+          resetForm: this.resetForm.bind(this),
         };
       }
 
