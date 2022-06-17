@@ -2,9 +2,9 @@ import React from "react";
 import PropTypes from "prop-types";
 
 const Select = (props) => {
-  const { label, required, error, id, option, value, name, onChange } = props;
+  const { label, required, error, id, option, value, name,disabled, onChange } = props;
   return (
-    <div className="form-group">
+    <div className="form-group mt-1">
       <label className="mb-1 fw-bold form-label" htmlFor={id}>
         {label}
         {required && <span className="text-danger"> *</span>}
@@ -12,6 +12,7 @@ const Select = (props) => {
       <select
         className={`form-select ${error ? "is-invalid" : ""}`}
         id={id}
+        disabled={disabled}
         name={name}
         onChange={onChange}
         value={value}

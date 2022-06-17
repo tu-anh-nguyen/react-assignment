@@ -19,8 +19,6 @@ const genders = [
 
 const Form = ({ initialValues }) => {
   const navigate = useNavigate();
-  const [status, setStatus] = useState(false);
-  const [submitCount, setSubmitCount] = useState(0);
   const dispatch = useDispatch();
   const {
     values,
@@ -97,7 +95,6 @@ const Form = ({ initialValues }) => {
     },
     validateOnChange: true,
     onSubmit: async (val) => {
-      setSubmitCount((pre) => pre + 1);
       const id = val.id;
       const body = {
         ...(id && { id }),
@@ -141,7 +138,6 @@ const Form = ({ initialValues }) => {
         resetForm();
         navigate("/");
       } catch (error) {
-        setStatus(false);
         dispatch(
           addToast({
             type: ToastType.ERROR,
@@ -161,30 +157,12 @@ const Form = ({ initialValues }) => {
     setFieldValue(name, val);
   };
   const isNewUser = !Boolean(values?.id);
-  const isFirstSubmit = !submitCount; // submitCount default = 0
   return (
     <div className="container-sm" style={{ maxWidth: 800 }}>
       <h2 className="text-uppercase fw-bold text-center py-4">
         {isNewUser ? "create a new user" : "update user"}
       </h2>
-      <div
-        className={`alert ${
-          !isFirstSubmit && !isSubmitting
-            ? status
-              ? "alert-success"
-              : "alert-danger"
-            : "alert-info"
-        }`}
-        role="alert"
-      >
-        {!isFirstSubmit && !isSubmitting && (
-          <>
-            {status
-              ? "The form was successfully submitted!"
-              : "The form was failed submitted."}
-            <br />
-          </>
-        )}
+      <div className="alert alert-info" role="alert">
         Fill the form below to {isNewUser ? "create a new user" : "update user"}
       </div>
 
@@ -267,6 +245,7 @@ const Form = ({ initialValues }) => {
             <Select
               label="Gender"
               required
+              disabled={isSubmitting}
               id="gender-selecte"
               option={genders}
               name="gender"
