@@ -1,55 +1,21 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { useFormik } from "formik";
-import { isValidPhoneNumber } from "libphonenumber-js";
-import * as yup from "yup";
 import moment from "moment";
-import poster from "../../services/poster";
-import putter from "../../services/putter";
+import { poster, putter } from "../../services";
 import Divider from "./Divider";
 import Input from "./Input";
 import Select from "./Select";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import {
-  addCreatedUser,
-  addEditedUser,
-  addToast,
-} from "../../redux/actions";
+import { addCreatedUser, addEditedUser, addToast } from "../../redux/actions";
 import { ToastType } from "../../redux/constants/toastConstant";
+import { useValidate, validateHelper } from "../../helpers";
 
 const genders = [
   { value: "male", label: "Male" },
   { value: "female", label: "Female" },
   { value: "other", label: "Other" },
 ];
-
-const validationSchema = yup.object().shape({
-  username: yup.string().required("Username is required"),
-  password: yup.string().required("Password is required"),
-  firstName: yup.string().required("First name is required"),
-  lastName: yup.string().required("Last name is required"),
-  maidenName: yup.string(),
-  gender: yup.string().required("Gender is required"),
-  email: yup.string().email("Invalid email").required("Email is required"),
-  phone: yup
-    .string()
-    .required("Phone number is required")
-    .test("isValidPhoneNumber", "Invalid phone number", function (value) {
-      if (!value) return true;
-      const isValid = isValidPhoneNumber(value);
-      return isValid;
-    }),
-  birthDate: yup
-    .date()
-    .required("Birth date is required")
-    .max(new Date(), "Birthday is invalid"),
-  address: yup.string(),
-  city: yup.string(),
-  postalCode: yup.string(),
-  state: yup.string(),
-  age: yup.number().moreThan(0, "Must be greater than 0"),
-});
 
 const Form = ({ initialValues }) => {
   const navigate = useNavigate();
@@ -63,9 +29,9 @@ const Form = ({ initialValues }) => {
     handleSubmit,
     setFieldError,
     setFieldValue,
-    isSubmitting,
     setSubmitting,
-  } = useFormik({
+    isSubmitting,
+  } = useValidate({
     initialValues: {
       id: initialValues.id || "",
       username: initialValues.username || "",
@@ -83,8 +49,53 @@ const Form = ({ initialValues }) => {
       state: initialValues.address?.state || "",
       age: initialValues.age || 0,
     },
-    validationSchema,
-    validateOnChange: false,
+    handleValidation: {
+      username: [
+        validateHelper.string(),
+        validateHelper.required("Username is required"),
+      ],
+      password: [
+        validateHelper.string(),
+        validateHelper.required("Password is required"),
+      ],
+      firstName: [
+        validateHelper.string(),
+        validateHelper.required("Firstname is required"),
+      ],
+      lastName: [
+        validateHelper.string(),
+        validateHelper.required("Lastname is required"),
+      ],
+      maidenName: [validateHelper.string()],
+      gender: [
+        validateHelper.string(),
+        validateHelper.required("Gender is required"),
+      ],
+      email: [
+        validateHelper.string(),
+        validateHelper.email(),
+        validateHelper.required("Email is required"),
+      ],
+      phone: [
+        validateHelper.string(),
+        validateHelper.phone(),
+        validateHelper.required("Phone number is required"),
+      ],
+      birthDate: [
+        validateHelper.date(),
+        validateHelper.required("Birth date is required"),
+      ],
+      address: [validateHelper.string()],
+      city: [validateHelper.string()],
+      postalCode: [validateHelper.string()],
+      state: [validateHelper.string()],
+      age: [
+        validateHelper.number(),
+        validateHelper.moreThan(0),
+        validateHelper.required("Age is required"),
+      ],
+    },
+    validateOnChange: true,
     onSubmit: async (val) => {
       setSubmitCount((pre) => pre + 1);
       const id = val.id;
@@ -127,9 +138,8 @@ const Form = ({ initialValues }) => {
             description: "",
           })
         );
-        console.log("resp", resp);
         resetForm();
-        navigate(-1);
+        navigate("/");
       } catch (error) {
         setStatus(false);
         dispatch(
@@ -139,16 +149,16 @@ const Form = ({ initialValues }) => {
             description: error?.message,
           })
         );
+        setSubmitting(false);
         throw Error(error);
       }
-      setSubmitting(false);
     },
   });
-
   const handleOnChangeInput = (event) => {
-    const { name, value } = event.target;
+    const { name, value, type } = event.target;
+    const val = type === "number" ? Number(value) : value;
     setFieldError(name, undefined);
-    setFieldValue(name, value);
+    setFieldValue(name, val);
   };
   const isNewUser = !Boolean(values?.id);
   const isFirstSubmit = !submitCount; // submitCount default = 0

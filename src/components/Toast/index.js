@@ -35,7 +35,7 @@ const Toast = ({ timeout = 3000 }) => {
           style={{ backgroundColor: backgroundColor }}
         >
           <button onClick={closeToast(id)}>
-            <i class="fa-solid fa-circle-xmark"></i>
+            <i className="fa-solid fa-circle-xmark"></i>
           </button>
           <div className={styles.notificationBox}>
             <p className={styles.title}>{title}</p>
