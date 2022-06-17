@@ -6,6 +6,8 @@ import Divider from "./Divider";
 import poster from "../../services/poster";
 import putter from "../../services/putter";
 import { withValidate, withRouter, validateHelper } from "../../helpers";
+import withToast from "../../helpers/withToast";
+import { ToastType } from "../../constants/toast";
 class Form extends Component {
   genders = [
     { value: "male", label: "Male" },
@@ -17,43 +19,24 @@ class Form extends Component {
     const {
       values,
       errors,
-      status,
-      submitCount,
       handleSubmit,
       setFieldError,
       setFieldValue,
       isSubmitting,
     } = this.props;
     const handleOnChangeInput = (event) => {
-      const { name, value } = event.target;
+      const { name, value, type } = event.target;
+      const val = type === "number" ? Number(value) : value;
       setFieldError(name, undefined);
-      setFieldValue(name, value);
+      setFieldValue(name, val);
     };
     const isNewUser = !Boolean(values?.id);
-    const isFirstSubmit = !submitCount; // submitCount default = 0
     return (
       <div className="container-sm" style={{ maxWidth: 800 }}>
         <h2 className="text-uppercase fw-bold text-center py-4">
           {isNewUser ? "create a new user" : "update user"}
         </h2>
-        <div
-          className={`alert ${
-            !isFirstSubmit && !isSubmitting
-              ? status
-                ? "alert-success"
-                : "alert-danger"
-              : "alert-info"
-          }`}
-          role="alert"
-        >
-          {!isFirstSubmit && !isSubmitting && (
-            <>
-              {status
-                ? "The form was successfully submitted!"
-                : "The form was failed submitted."}
-              <br />
-            </>
-          )}
+        <div className="alert  alert-info" role="alert">
           Fill the form below to{" "}
           {isNewUser ? "create a new user" : "update user"}
         </div>
@@ -137,6 +120,7 @@ class Form extends Component {
               <Select
                 label="Gender"
                 required
+                disabled={isSubmitting}
                 id="gender-selecte"
                 option={this.genders}
                 name="gender"
@@ -161,6 +145,7 @@ class Form extends Component {
                     moment(new Date()).diff(moment(birthDate), "years", true)
                   );
                   setFieldError(name, undefined);
+                  setFieldError("age", undefined);
                   setFieldValue(name, value);
                   setFieldValue("age", age);
                 }}
@@ -347,14 +332,8 @@ const formikForm = withValidate({
       validateHelper.required("Age is required"),
     ],
   },
-  validateOnChange: false,
+  validateOnChange: true,
   onSubmit: async (values, props) => {
-    // const {
-    //   setSubmitting,
-    //   resetForm,
-    //   setStatus,
-    //   props: { match } = {}, // match is props of withRouter, we use this to go back previous page.
-    // } = props;
     const id = values.id;
     const body = {
       ...(id && { id }),
@@ -376,24 +355,26 @@ const formikForm = withValidate({
       age: values.age,
     };
     try {
-      let resp;
       if (!id) {
-        const { data } = await poster("/users/add", body);
-        resp = data;
+        await poster("/users/add", body);
       } else {
-        const { data } = await putter(`users/${id}`, body);
-        resp = data;
+        await putter(`users/${id}`, body);
       }
-      if (!resp?.id) {
-        return;
-      }
-      setTimeout(() => {
-        props.match.navigate("/");
-      }, 1000);
+      props.addToast({
+        type: ToastType.SUCCESS,
+        title: !id ? "Created user sucessfully!" : "Updated user sucessfully!",
+        description: "",
+      });
+      props.match.navigate("/");
     } catch (error) {
+      props.addToast({
+        type: ToastType.ERROR,
+        title: "Something went wrong",
+        description: error?.message,
+      });
       throw Error(error);
     }
   },
 })(Form);
 
-export default withRouter(formikForm);
+export default withRouter(withToast(formikForm));

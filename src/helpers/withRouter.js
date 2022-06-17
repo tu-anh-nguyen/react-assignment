@@ -1,3 +1,4 @@
+import React from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 function withRouter(Component) {
@@ -5,13 +6,7 @@ function withRouter(Component) {
     let location = useLocation();
     let navigate = useNavigate();
     let params = useParams();
-    return (
-      <Component
-        {...props}
-        key={JSON.stringify(params)}
-        match={{ location, navigate, params }}
-      />
-    );
+    return <Component {...props} match={{ location, navigate, params }} />;
   }
   return ComponentWithRouterProp;
 }

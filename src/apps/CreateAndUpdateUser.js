@@ -19,7 +19,7 @@ class CreateUser extends Component {
     const { id } = this.props.match.params;
     if (id) {
       document.title = "Update user";
-      this.setState((pre) => ({ ...pre, loading: true }));
+      this.setState({ loading: true });
       const initialValues = await this.fetchUserDetail(id);
       this.setState({ initialValues, loading: false });
     } else {

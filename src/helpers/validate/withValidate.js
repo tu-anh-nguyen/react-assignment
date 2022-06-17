@@ -18,7 +18,7 @@ const withValidate = ({
         this.state = {
           isSubmitting: false,
           errors: {},
-          errorsOnSubmit: {},
+          touched: {},
           values: this.initialValues,
           isValid: true,
         };
@@ -27,37 +27,41 @@ const withValidate = ({
         this.handleSubmit.bind(this);
       }
 
-      onBlur(event) {
-        const { touched } = this.state;
-        let { name: field, value } = event.target;
-        this.setState(!touched);
-        this.runValidate(field, value);
-      }
-
       setSubmitting(_value) {
         this.setState({ isSubmitting: _value });
       }
 
       handleChange(event) {
         let { name: field, value } = event.target;
+        this.setFieldTouch(field, true);
         if (this.validateOnChange) {
           this.runValidate(field, value);
         } else this.setFieldValue(field, value);
       }
-      setFieldError(_field, _value) {
-        let { errors } = this.state;
-        errors[_field] = _value;
-        this.setState(errors);
+
+      setFieldTouch(_field, _value) {
+        let { touched } = this.state;
+        touched[_field] = _value;
+        this.setState({ touched });
       }
+
+      setFieldError(_field, _value) {
+        const { errors } = this.state;
+        errors[_field] = _value;
+        this.setState({ errors });
+      }
+
       setFieldValue(_field, _value) {
         let { values } = this.state;
         values[_field] = _value;
-        this.setState(values);
+        this.setState({ values });
       }
+
       async handleSubmit(event) {
         event.preventDefault();
         this.setState({ isSubmitting: true });
-        if (!this.validateOnChange) {
+        var isFormHasChanged = this.checkFormHasChanged();
+        if (!this.validateOnChange || !isFormHasChanged) {
           this.fields.forEach((field) =>
             this.runValidate(field, this.state.values[field])
           );
@@ -68,8 +72,13 @@ const withValidate = ({
         }
         this.setState({ isSubmitting: false });
       }
+
       checkIsInvalid() {
         return Object.values(this.state.errors).some((err) => err);
+      }
+
+      checkFormHasChanged() {
+        return Object.values(this.state.touched).some((touch) => touch);
       }
       resetForm() {
         this.setState({
@@ -77,22 +86,22 @@ const withValidate = ({
           errors: {},
         });
       }
-      runValidate(field, value) {
-        let { values, errors } = this.state;
-        values[field] = value;
-        const validates = this.validate[field] || [];
+      runValidate(_field, _value) {
+        const { values, errors } = this.state;
+        const validates = this.validate[_field] || [];
         const { error } = validates.reduce(
           (acc, validate = {}) => {
             const { handleValidate, priority } = validate;
             if (!acc.priority || !acc.error || acc.priority >= priority) {
-              acc.error = handleValidate?.(value) || acc.error;
+              acc.error = handleValidate?.(_value) || acc.error;
               acc.priority = priority;
             }
             return acc;
           },
           { error: "" }
         );
-        errors[field] = error;
+        errors[_field] = error;
+        values[_field] = _value;
         this.setState({
           errors,
           values,

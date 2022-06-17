@@ -2,8 +2,17 @@ import React, { Component } from "react";
 
 export default class Select extends Component {
   render() {
-    const { label, required, error, id, option, value, name, onChange } =
-      this.props;
+    const {
+      label,
+      required,
+      error,
+      id,
+      option,
+      disabled,
+      value,
+      name,
+      onChange,
+    } = this.props;
     return (
       <div className="form-group mt-1">
         <label className="mb-1 fw-bold form-label" htmlFor={id}>
@@ -11,6 +20,7 @@ export default class Select extends Component {
           {required && <span className="text-danger"> *</span>}
         </label>
         <select
+          disabled={disabled}
           className={`form-select ${error ? "is-invalid" : ""}`}
           id={id}
           name={name}

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import withRouter from "../../helpers/withRouter";
 import fetcher from "../../services/fetcher";
 import deleter from "../../services/deleter";
@@ -102,7 +102,7 @@ class UserList extends Component {
       },
       renderCell: (id) => (
         <div className="d-flex justify-content-around align-items-center">
-          <NavLink to={`/update/${id}`}>
+          <Link to={`/update/${id}`}>
             <button
               type="button"
               title="Update user"
@@ -110,7 +110,7 @@ class UserList extends Component {
             >
               <i className="fa-solid fa-pen"></i>
             </button>
-          </NavLink>
+          </Link>
           <button
             type="button"
             title="Remove user"
