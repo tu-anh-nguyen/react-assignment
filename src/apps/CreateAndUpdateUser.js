@@ -25,7 +25,10 @@ function CreateUser() {
     if (id) {
       document.title = "Update user";
       fetchUserDetail(id);
-    } else document.title = "Create new user";
+    } else {
+      document.title = "Create new user";
+      setInitialValues({});
+    }
   }, [id]);
 
   if (loading) {
