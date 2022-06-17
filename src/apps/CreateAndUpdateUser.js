@@ -22,8 +22,11 @@ class CreateUser extends Component {
       this.setState((pre) => ({ ...pre, loading: true }));
       const initialValues = await this.fetchUserDetail(id);
       this.setState({ initialValues, loading: false });
-    } else document.title = "Create new user";
+    } else {
+      document.title = "Create new user";
+    }
   }
+
   render() {
     const { initialValues, loading } = this.state;
     if (loading) {
@@ -34,12 +37,7 @@ class CreateUser extends Component {
         </div>
       );
     }
-    return (
-      <UserForm
-        key={JSON.stringify(initialValues)}
-        initialValues={initialValues}
-      />
-    );
+    return <UserForm initialValues={initialValues} />;
   }
 }
 

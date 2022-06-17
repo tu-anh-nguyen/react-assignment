@@ -5,7 +5,13 @@ function withRouter(Component) {
     let location = useLocation();
     let navigate = useNavigate();
     let params = useParams();
-    return <Component {...props} match={{ location, navigate, params }} />;
+    return (
+      <Component
+        {...props}
+        key={JSON.stringify(params)}
+        match={{ location, navigate, params }}
+      />
+    );
   }
   return ComponentWithRouterProp;
 }
