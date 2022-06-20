@@ -7,8 +7,12 @@
 .topRight {
   top: 70px;
   right: 1rem;
-  animation: toast-in-right 0.7s;
+  animation: toast-in-right 3s;
 }
+/* .disappear {
+  animation: toast-disappear 0.7s;
+  animation-delay: 2.3s;
+} */
 
 .notification {
   margin-bottom: 1rem;
@@ -37,7 +41,7 @@
   float: right;
   background: none;
   border: none;
-  color: #FFFFFF;
+  color: #ffffff;
   opacity: 0.8;
   cursor: pointer;
 }
@@ -58,10 +62,16 @@
 }
 
 @keyframes toast-in-right {
-  from {
+  0% {
     transform: translateX(100%);
   }
-  to {
+  24% {
     transform: translateX(0);
+  }
+  76% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100%);
   }
 }

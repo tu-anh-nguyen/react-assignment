@@ -31,7 +31,7 @@ const Toast = ({ timeout = 3000 }) => {
       {toastlist.map(({ id, title, description, backgroundColor }, i) => (
         <div
           key={i}
-          className={`${styles.notification} ${styles.toast} ${styles.topRight}`}
+          className={`${styles.notification} ${styles.disappear} ${styles.toast} ${styles.topRight}`}
           style={{ backgroundColor: backgroundColor }}
         >
           <button onClick={closeToast(id)}>

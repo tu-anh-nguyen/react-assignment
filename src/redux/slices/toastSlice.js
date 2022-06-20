@@ -35,6 +35,13 @@ export const toastSlice = createSlice({
       state.push(toast);
     },
 
+    prepareDisappearToast: (state, { payload: idx }) => {
+      const index = state.findIndex(({ id }) => id === idx);
+      let st = state;
+      st[index] = { ...st[index], pending: true };
+      state = st;
+    },
+
     deleteToast: (state, { payload: idx }) => {
       const index = state.findIndex(({ id }) => id === idx);
       state = state.splice(index, 1);
